@@ -34,6 +34,7 @@ model Business {
   id              Int             @id @default(autoincrement())
   name            String
   phoneNumber     String?
+  logo            String?
   category        Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   categoryId      Int
   businessOwner   BusinessOwner   @relation(fields: [businessOwnerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
