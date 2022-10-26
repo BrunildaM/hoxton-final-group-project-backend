@@ -301,7 +301,7 @@ app.get("/validate/client", async (req, res) => {
       if (client) {
         const newToken = generateToken(client.id);
         //send the user with a new token
-        res.send({ user: client, token: newToken });
+        res.send({ client: client, token: newToken });
       } else {
         //check all possible errors
         res.status(400).send({ errors: ["Invalid token!"] });
