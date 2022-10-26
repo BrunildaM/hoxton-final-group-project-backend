@@ -71,8 +71,8 @@ model Appointment {
   id         Int      @id @default(autoincrement())
   service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   serviceId  Int      @unique
-  startTime  String
-  endTime    String
+  startTime  DateTime
+  endTime    DateTime
   client     Client   @relation(fields: [clientId], references: [id])
   business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   businessId Int
