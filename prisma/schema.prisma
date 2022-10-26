@@ -9,3 +9,72 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model BusinessOwner {
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  password String
+  name     String
+  avatar   String?
+  age      Int
+  business Business?
+}
+
+model Client {
+  id           Int           @id @default(autoincrement())
+  name         String
+  avatar       String?
+  email        String        @unique
+  password     String
+  phoneNumber  String
+  appointments Appointment[]
+}
+
+model Business {
+  id              Int             @id @default(autoincrement())
+  name            String
+  phoneNumber     String?
+  category        Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId      Int
+  businessOwner   BusinessOwner   @relation(fields: [businessOwnerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  businessOwnerId Int             @unique
+  appointments    Appointment[]
+  businessHours   BusinessHours[]
+}
+
+model Category {
+  id         Int        @id @default(autoincrement())
+  name       String
+  services   Service[]
+  businesses Business[]
+}
+
+model Service {
+  id          Int          @id @default(autoincrement())
+  name        String
+  duration    String
+  cateory     Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId  Int
+  appointment Appointment?
+}
+
+model BusinessHours {
+  id           Int      @id @default(autoincrement())
+  day          String //monday
+  openingHours String
+  closingHours String
+  business     Business @relation(fields: [businessId], references: [id])
+  businessId   Int
+}
+
+model Appointment {
+  id         Int      @id @default(autoincrement())
+  service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  serviceId  Int      @unique
+  startTime  String
+  endTime    String
+  client     Client   @relation(fields: [clientId], references: [id])
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  businessId Int
+  clientId   Int
+}
