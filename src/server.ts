@@ -89,13 +89,6 @@ app.post("/business", async (req, res) => {
       ...newBusinessData,
       category: { connect: { id: req.body.id } },
       businessOwner: { connect: { email: req.body.email } },
-      // businessHours: {
-      //   create: {
-      //     day: req.body.day,
-      //     closingHours: req.body.closingHours,
-      //     openingHours: req.body.openingHours,
-      //   },
-      // },
     },
   });
   res.send(newBusiness) 
