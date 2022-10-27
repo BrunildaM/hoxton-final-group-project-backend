@@ -348,17 +348,24 @@ app.post("/appointment", async (req, res) => {
     const title = req.body.title;
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
+    const token = req.headers.authorization;
 
-    const newAppointment = await prisma.appointment.create({
-      data: {
-        title,
-        startDate,
-        endDate,
-        business: { connect: { businessOwnerId: Number(req.body.id) } },
-        client: { connect: { email: req.body.email } },
-      },
-    });
-    res.send(newAppointment);
+    if (token) {
+      const client = await getCurrentClient(token);
+      const newAppointment = await prisma.appointment.create({
+        data: {
+          title,
+          startDate,
+          endDate,
+          business: { connect: { businessOwnerId: Number(req.body.id) } },
+          client: { connect: { email: client?.email } },
+        },
+      });
+      res.send(newAppointment);
+    } else {
+      //@ts-ignore
+      res.status(404).send({ error: error.message });
+    }
   } catch (error) {
     //@ts-ignore
     res.status(404).send({ error: error.message });
@@ -366,15 +373,15 @@ app.post("/appointment", async (req, res) => {
 });
 
 app.delete("/appointment/:id", async (req, res) => {
-  try{
-  const id = Number(req.params.id)
-  const appointment = await prisma.appointment.delete({where: {id}})
-  res.send("Deleted")
-} catch (error) {
-  //@ts-ignore
-  res.status(400).send({errors: [error.message]})
-}
-})
+  try {
+    const id = Number(req.params.id);
+    const appointment = await prisma.appointment.delete({ where: { id } });
+    res.send("Deleted");
+  } catch (error) {
+    //@ts-ignore
+    res.status(400).send({ errors: [error.message] });
+  }
+});
 
 app.listen(port, () => {
   console.log(`App is running: http://localhost:${port}`);
