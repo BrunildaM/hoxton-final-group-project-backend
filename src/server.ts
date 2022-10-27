@@ -41,7 +41,7 @@ app.get("/business/:id", async (req, res) => {
       const business = await prisma.business.findUnique({
         where: { id },
         include: {
-          appointments: {include: {client: true}},
+          appointments: { include: { client: true } },
           businessHours: true,
           category: { include: { services: true } },
         },
@@ -69,8 +69,36 @@ app.get("/categories", async (req, res) => {
   }
 });
 
+//Create a new business
+app.post("/business", async (req, res) => {
+  try {
+  const { name, phoneNumber, logo } = req.body;
+  const newBusinessData = {
+    name,
+    phoneNumber,
+    logo,
+  };
 
-
+  const newBusiness = await prisma.business.create({
+    data: {
+      ...newBusinessData,
+      category: { connect: { id: req.body.id } },
+      businessOwner: { connect: { email: req.body.email } },
+      // businessHours: {
+      //   create: {
+      //     day: req.body.day,
+      //     closingHours: req.body.closingHours,
+      //     openingHours: req.body.openingHours,
+      //   },
+      // },
+    },
+  });
+  res.send(newBusiness) 
+} catch (error) {
+  //@ts-ignore
+  res.status(400).send({ errors: [error.message] });
+}
+});
 
 //Log-in a business owner that already exists with it's credentials
 app.post("/sign-in/businessOwner", async (req, res) => {
@@ -255,7 +283,7 @@ app.post("/sign-up/businessOwner", async (req, res) => {
     // };
 
     const newBusinessOwner = await prisma.businessOwner.create({
-      data: userData
+      data: userData,
       // data: { ...userData, business: { create: businessData } },
     });
 
