@@ -33,6 +33,11 @@ app.get("/business", async (req, res) => {
   }
 });
 
+app.get("/appointments",async(req,res)=>{
+  const appointemnts = await prisma.appointment.findMany()
+  res.send(appointemnts)
+})
+
 //get a single business with the clients
 app.get("/business/:id", async (req, res) => {
   try {
@@ -314,6 +319,33 @@ app.get("/validate/client", async (req, res) => {
     res.status(400).send({ errors: [error.message] });
   }
 });
+
+app.post("/appointment",async(req,res)=>{
+
+  const title = req.body.title
+  const startDate = req.body.startDate
+  const endDate = req.body.endDate
+  const business = req.body.business
+  const client = req.body.client
+  const service = req.body.service
+  
+ try {
+   const newAppointment = await prisma.appointment.create(
+    {data:{
+       title,
+       startDate,
+       endDate,
+       business,
+       client,
+       service
+    }}
+  )
+  res.send(newAppointment)
+ } catch (error) {
+  //@ts-ignore
+  res.status(404).send({error: error.message})
+ }
+})
 
 app.listen(port, () => {
   console.log(`App is running: http://localhost:${port}`);
