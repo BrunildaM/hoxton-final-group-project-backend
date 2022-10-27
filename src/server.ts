@@ -353,9 +353,8 @@ app.post("/appointment",async(req,res)=>{
   const title = req.body.title
   const startDate = req.body.startDate
   const endDate = req.body.endDate
-  const business = req.body.business
   const client = req.body.client
-  const service = req.body.service
+  // const service = req.body.service
   
  try {
    const newAppointment = await prisma.appointment.create(
@@ -363,9 +362,9 @@ app.post("/appointment",async(req,res)=>{
        title,
        startDate,
        endDate,
-       business,
-       client,
-       service
+       business: {connect: {businessOwnerId: Number(req.body.id)}},
+       client: {connect: {email: req.body.email}},
+       service: {connect: {id: Number(req.body.id)}}
     }}
   )
   res.send(newAppointment)
