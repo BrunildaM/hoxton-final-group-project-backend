@@ -320,32 +320,30 @@ app.get("/validate/client", async (req, res) => {
   }
 });
 
-app.post("/appointment",async(req,res)=>{
+app.post("/appointment", async (req, res) => {
+  const title = req.body.title;
+  const startDate = req.body.startDate;
+  const endDate = req.body.endDate;
+  const client = req.body.client;
+  // const service = req.body.service
 
-  const title = req.body.title
-  const startDate = req.body.startDate
-  const endDate = req.body.endDate
-  const business = req.body.business
-  const client = req.body.client
-  const service = req.body.service
-  
- try {
-   const newAppointment = await prisma.appointment.create(
-    {data:{
-       title,
-       startDate,
-       endDate,
-       business,
-       client,
-       service
-    }}
-  )
-  res.send(newAppointment)
- } catch (error) {
-  //@ts-ignore
-  res.status(404).send({error: error.message})
- }
-})
+  try {
+    const newAppointment = await prisma.appointment.create({
+      data: {
+        title,
+        startDate,
+        endDate,
+        business: { connect: { businessOwnerId: Number(req.body.id) } },
+        client: { connect: { email: req.body.email } },
+        service: { connect: { id: Number(req.body.id) } },
+      },
+    });
+    res.send(newAppointment);
+  } catch (error) {
+    //@ts-ignore
+    res.status(404).send({ error: error.message });
+  }
+});
 
 app.listen(port, () => {
   console.log(`App is running: http://localhost:${port}`);
