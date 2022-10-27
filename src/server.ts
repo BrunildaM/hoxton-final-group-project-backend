@@ -341,7 +341,8 @@ app.get("/validate/client", async (req, res) => {
   }
 });
 
-app.post("/appointment",async(req,res)=>{
+app.post("/appointment", async (req, res) => {
+
 
   const title = req.body.title
   const startDate = req.body.startDate
