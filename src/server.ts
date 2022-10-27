@@ -65,7 +65,7 @@ app.get("/business/:id", async (req, res) => {
 app.get("/categories", async (req, res) => {
   try {
     const categories = await prisma.category.findMany({
-      include: { businesses: { include: { businessHours: true } } },
+      include: { businesses: { include: { businessHours: true, appointments: true } } },
     });
     res.send(categories);
   } catch (error) {
