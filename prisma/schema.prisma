@@ -70,8 +70,8 @@ model BusinessHours {
 
 model Appointment {
   id         Int      @id @default(autoincrement())
-  service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  serviceId  Int      @unique
+  service    Service?  @relation(fields: [serviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  serviceId  Int?      @unique
   client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   title      String?
   startDate   String?

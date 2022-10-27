@@ -33,10 +33,10 @@ app.get("/business", async (req, res) => {
   }
 });
 
-app.get("/appointments",async(req,res)=>{
-  const appointemnts = await prisma.appointment.findMany()
-  res.send(appointemnts)
-})
+app.get("/appointments", async (req, res) => {
+  const appointemnts = await prisma.appointment.findMany();
+  res.send(appointemnts);
+});
 
 //get a single business with the clients
 app.get("/business/:id", async (req, res) => {
@@ -65,7 +65,9 @@ app.get("/business/:id", async (req, res) => {
 app.get("/categories", async (req, res) => {
   try {
     const categories = await prisma.category.findMany({
-      include: { businesses: { include: { businessHours: true, appointments: true } } },
+      include: {
+        businesses: { include: { businessHours: true, appointments: true } },
+      },
     });
     res.send(categories);
   } catch (error) {
@@ -77,25 +79,25 @@ app.get("/categories", async (req, res) => {
 //Create a new business
 app.post("/business", async (req, res) => {
   try {
-  const { name, phoneNumber, logo } = req.body;
-  const newBusinessData = {
-    name,
-    phoneNumber,
-    logo,
-  };
+    const { name, phoneNumber, logo } = req.body;
+    const newBusinessData = {
+      name,
+      phoneNumber,
+      logo,
+    };
 
-  const newBusiness = await prisma.business.create({
-    data: {
-      ...newBusinessData,
-      category: { connect: { id: req.body.id } },
-      businessOwner: { connect: { email: req.body.email } },
-    },
-  });
-  res.send(newBusiness) 
-} catch (error) {
-  //@ts-ignore
-  res.status(400).send({ errors: [error.message] });
-}
+    const newBusiness = await prisma.business.create({
+      data: {
+        ...newBusinessData,
+        category: { connect: { id: req.body.id } },
+        businessOwner: { connect: { email: req.body.email } },
+      },
+    });
+    res.send(newBusiness);
+  } catch (error) {
+    //@ts-ignore
+    res.status(400).send({ errors: [error.message] });
+  }
 });
 
 //Log-in a business owner that already exists with it's credentials
@@ -342,30 +344,36 @@ app.get("/validate/client", async (req, res) => {
 });
 
 app.post("/appointment", async (req, res) => {
+  try {
+    const title = req.body.title;
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
 
+    const newAppointment = await prisma.appointment.create({
+      data: {
+        title,
+        startDate,
+        endDate,
+        business: { connect: { businessOwnerId: Number(req.body.id) } },
+        client: { connect: { email: req.body.email } },
+      },
+    });
+    res.send(newAppointment);
+  } catch (error) {
+    //@ts-ignore
+    res.status(404).send({ error: error.message });
+  }
+});
 
-  const title = req.body.title
-  const startDate = req.body.startDate
-  const endDate = req.body.endDate
-  const client = req.body.client
-  // const service = req.body.service
-  
- try {
-   const newAppointment = await prisma.appointment.create(
-    {data:{
-       title,
-       startDate,
-       endDate,
-       business: {connect: {businessOwnerId: Number(req.body.id)}},
-       client: {connect: {email: req.body.email}},
-       service: {connect: {id: Number(req.body.id)}}
-    }}
-  )
-  res.send(newAppointment)
- } catch (error) {
+app.delete("/appointment/:id", async (req, res) => {
+  try{
+  const id = Number(req.params.id)
+  const appointment = await prisma.appointment.delete({where: {id}})
+  res.send("Deleted")
+} catch (error) {
   //@ts-ignore
-  res.status(404).send({error: error.message})
- }
+  res.status(400).send({errors: [error.message]})
+}
 })
 
 app.listen(port, () => {
