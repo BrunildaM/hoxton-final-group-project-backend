@@ -38,6 +38,22 @@ app.get("/appointments", async (req, res) => {
   res.send(appointemnts);
 });
 
+app.get("/appointmentsForBusiness/:id", async (req, res) => {
+  const token = req.headers.authorization;
+  try {
+    if (token) {
+      const user = await getCurrentClient(token);
+      const appointemnts = await prisma.appointment.findMany({
+        where: { clientId: user?.id, businessId: Number(req.params.id) },
+      });
+      res.send(appointemnts);
+    }
+  } catch (error) {
+    //@ts-ignore
+    res.status(400).send({ errors: [error.message] });
+  }
+});
+
 //get a single business with the clients
 app.get("/business/:id", async (req, res) => {
   try {
@@ -357,7 +373,9 @@ app.post("/appointment", async (req, res) => {
           title,
           startDate,
           endDate,
-          business: { connect: { businessOwnerId: Number(req.body.id) } },
+          business: {
+            connect: { id: Number(req.body.businessId) },
+          },
           client: { connect: { email: client?.email } },
         },
       });
