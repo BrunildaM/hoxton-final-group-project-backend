@@ -89,12 +89,14 @@ app.post("/business", async (req, res) => {
     const newBusiness = await prisma.business.create({
       data: {
         ...newBusinessData,
-        category: { connect: { id: req.body.id } },
+        category: { connect: { id: req.body.categoryId } },
         businessOwner: { connect: { email: req.body.email } },
       },
     });
     res.send(newBusiness);
   } catch (error) {
+     //@ts-ignore
+    console.log(error.message)
     //@ts-ignore
     res.status(400).send({ errors: [error.message] });
   }
@@ -357,7 +359,7 @@ app.post("/appointment", async (req, res) => {
           title,
           startDate,
           endDate,
-          business: { connect: { businessOwnerId: Number(req.body.id) } },
+          business: { connect: { businessOwnerId: Number(req.body.businessOwnerId) } },
           client: { connect: { email: client?.email } },
         },
       });
