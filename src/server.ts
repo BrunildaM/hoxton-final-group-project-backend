@@ -362,14 +362,14 @@ app.get("/validate/client", async (req, res) => {
 });
 
 app.post("/appointment", async (req, res) => {
-  try {
+ 
     const title = req.body.title;
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
-    // const token = req.headers.authorization;
-
-    // if (token) {
-    //   const client = await getCurrentClient(token);
+     const token = req.headers.authorization;
+ try {
+     if (token) {
+       const client = await getCurrentClient(token);
       const newAppointment = await prisma.appointment.create({
         data: {
           title,
@@ -382,7 +382,7 @@ app.post("/appointment", async (req, res) => {
         },
       });
       res.send(newAppointment);
-  } catch (error) {
+  }} catch (error) {
     //@ts-ignore
     console.log(error.message)
     //@ts-ignore
